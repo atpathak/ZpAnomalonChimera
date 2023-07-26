@@ -2,3 +2,5 @@ physpy
 *.py~
 *.C~
 *.h~
+*.md~
+*.sh~
