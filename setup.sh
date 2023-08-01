@@ -7,7 +7,6 @@ source $LCG/setup.sh
 
 if [[ -f $NAME/bin/activate ]]; then
   echo "$NAME already installed. Run \`source $NAME/bin/activate\` to activate"
-  exit 1
 fi
 python -m venv --copies $NAME
 source $NAME/bin/activate
