@@ -7,9 +7,10 @@ source $LCG/setup.sh
 
 if [[ -f $NAME/bin/activate ]]; then
   echo "$NAME already installed. Run \`source $NAME/bin/activate\` to activate"
+else
+    python -m venv --copies $NAME
+    source $NAME/bin/activate
+    python -m pip install boost-histogram
 fi
-python -m venv --copies $NAME
-source $NAME/bin/activate
-python -m pip install boost-histogram
 
 
