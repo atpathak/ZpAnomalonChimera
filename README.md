@@ -7,7 +7,7 @@ This is the repo of the third, fourth, and plotting  steps of the ZpAnomalon Ana
 The following python packages are required:
 
 + pyroot
-+ uproot3
++ uproot
 + pandas
 + numpy
 + boost-histogram
@@ -17,13 +17,13 @@ if you already have Python 3 working with ROOT, with the above dependences, skip
 
 ### Using LCG
 
-We want to use cvmfs and stuff so this works on the LPC because my conda stuff got stale and no longer works.
+We want to use cvmfs and stuff so this works on the LPC because the original conda environment pre-2023 got stale and no longer works. To find an LCG environment with the packages we want, we need to check the LCG page: https://lcginfo.cern.ch/
 
-trying to find an LCG environment with the packages I want: https://lcginfo.cern.ch/
+In principle, everything should be updated to run on the lateset supported versions of things, but principles do not always matter. The analysis originally ran with ROOT version 6.22/08. The closest LCG environment that works uses ROOT 6.22/06, so that is the one we will use! The main difference in this environment to the original running one was the move to uprooot 4. While running on the LPC of lxplus, cvmfs is mounted, so to source the environment (in bash), run
 
-trying LCG: need ROOT 6.22 to work with the RestFrames -> checked with 6.22/08
-
-source /cvmfs/sft.cern.ch/lcg/views/LCG_99/x86_64-centos7-gcc10-opt/setup.sh -> 6.22/06
+```
+source /cvmfs/sft.cern.ch/lcg/views/LCG_99/x86_64-centos7-gcc10-opt/setup.sh
+```
 
 ## Download Repository and Setup Restframes
 
@@ -39,3 +39,18 @@ make
 make install
 ```
 Compiling restframes should take about 10 minutes, so do not panic.
+
+## Running Jobs on the lpc Condor Cluster
+
+All processing can now be run as jobs. Things can be run interactively as well, but it takes a bit of finagling to get the command line options correct (mostly need the full path for accessing files on eos). As always, one has to make sure they have a valid grid certificate and proxy active, so you might as well run it for the max time by executing:
+
+```
+voms-proxy-init --rfc --voms cms -valid 192:00
+```
+
+### Topiary Jobs
+
+These are really complicated with a lot of dependecies. Working on make this setup smoother.
+
+### Selection jobs
+
