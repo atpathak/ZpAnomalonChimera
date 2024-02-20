@@ -1,0 +1,3 @@
+[submodule "condorbatch/topiary_jobs/RestFrames"]
+	path = condorbatch/topiary_jobs/RestFrames
+	url = git@github.com:crogan/RestFrames.git

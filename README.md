@@ -19,26 +19,39 @@ if you already have Python 3 working with ROOT, with the above dependences, skip
 
 We want to use cvmfs and stuff so this works on the LPC because the original conda environment pre-2023 got stale and no longer works. To find an LCG environment with the packages we want, we need to check the LCG page: https://lcginfo.cern.ch/
 
-In principle, everything should be updated to run on the lateset supported versions of things, but principles do not always matter. The analysis originally ran with ROOT version 6.22/08. The closest LCG environment that works uses ROOT 6.22/06, so that is the one we will use! The main difference in this environment to the original running one was the move to uprooot 4. While running on the LPC of lxplus, cvmfs is mounted, so to source the environment (in bash), run
+In principle, everything should be updated to run on the lateset supported versions of things, but principles do not always matter. The analysis originally ran with ROOT version 6.22/08. The closest LCG environment that works uses ROOT 6.22/06, so that is the one we will use! While running on the LPC or lxplus (though these instructions are not tested on lxplus), cvmfs is mounted, so to source the environment (in bash), run
 
 ```
 source /cvmfs/sft.cern.ch/lcg/views/LCG_99/x86_64-centos7-gcc10-opt/setup.sh
 ```
 
-## Download Repository and Setup Restframes
+## Making Topiary - RJR calculation and tree trimming (and flattening)
 
-We use the [RestFrames](http://restframes.com/) package to calculate the mass esitmators of the Z' cascade decay.
+In principle, everything should be updated to run on the lateset supported versions of things, but principles do not always matter. The analysis originally ran with ROOT version 6.22/08. The closest LCG environment that works uses ROOT 6.22/06, so that is the one we will use! While running on the LPC or lxplus (though these instructions are not tested on lxplus), cvmfs is mounted, so to source the environment (in bash), run
 
-I install RestFrames in the repo directory, to make it easy to keep track, and to avoid possible conflicts on my larger system.
+```
+source /cvmfs/sft.cern.ch/lcg/views/LCG_99/x86_64-centos7-gcc10-opt/setup.sh
+```
+
+### Setting up the dependencies
+
+Topiary has a lot of dependencies that make it tricker to setup and run, but we will get there. Most of this only has to be done once. I am sure there are better ways to do this, but this was the best compromise of ease and expedience I could produce.
+
+#### RestFrames
+
+We use the [RestFrames](http://restframes.com/) package to calculate the mass esitmators of the Z' cascade decay. RestFrames is run in the 'topiary' step, which is setup to be run as a condor bacth job. Therefore, all of the topiary-step dependencies are built in the `condorbatch/topiary_jobs` directory. MAKE SURE THE ABOVE ENOVIRONMENT IS SOURCED. To build `RestFrames` in the topiary environment, do:
 
 ```bash
-git clone git@github.com:crogan/RestFrames.git
-cd RestFrames
+cd condorbatch/topiary_jobs/RestFrames
 ./configure --prefix=$PWD
 make
 make install
 ```
-Compiling restframes should take about 10 minutes, so do not panic.
+Compiling restframes can take up to 10 minutes, so do not panic.
+
+#### UHH for Jet Systematics
+
+
 
 ## Running Jobs on the lpc Condor Cluster
 
