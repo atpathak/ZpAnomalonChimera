@@ -17,9 +17,7 @@ if you already have Python 3 working with ROOT, with the above dependences, skip
 
 ### Using LCG
 
-We want to use cvmfs and stuff so this works on the LPC because the original conda environment pre-2023 got stale and no longer works. To find an LCG environment with the packages we want, we need to check the LCG page: https://lcginfo.cern.ch/
-
-In principle, everything should be updated to run on the lateset supported versions of things, but principles do not always matter. The analysis originally ran with ROOT version 6.22/08. The closest LCG environment that works uses ROOT 6.22/06, so that is the one we will use! While running on the LPC or lxplus (though these instructions are not tested on lxplus), cvmfs is mounted, so to source the environment (in bash), run
+We want to use cvmfs and stuff so this works on the LPC because the original conda environment pre-2023 got stale and no longer works. To find an LCG environment with the packages we want, we need to check the LCG page: https://lcginfo.cern.ch/ . Each step uses different LCG environments -- I am sure this could be alleviated but it was easier to use different LCG environments for the different steps than to significanntly rewrite the framework. 
 
 ```
 source /cvmfs/sft.cern.ch/lcg/views/LCG_99/x86_64-centos7-gcc10-opt/setup.sh
@@ -64,7 +62,39 @@ This will build the parts of the `UHH2` we need. We probably could get away with
 
 #### Linking it all together
 
-If you peruse the `topiary_jobs` subdirectory in the `condorbatch` directory, you will quickly see many subdirectories. These all hold the scale factors applied in this analysis. They came from a wide variety of places, and some were custom generated. That documentation is found in the note. Initially, and after any change to the topiary class, the whole directory must be compiled. And for that to work, several things must happen.
+If you peruse the `topiary_jobs` subdirectory in the `condorbatch` directory, you will quickly see many subdirectories. These all hold the scale factors applied in this analysis. They came from a wide variety of places, and some were custom generated. That documentation is found in the note. Initially, and after any change to the topiary class, the whole directory must be compiled. And for that to work, several things must happen. Now that the dependencies are built, the `TreeMakerTopiary` class must be compiled. To compile,
+
+```bash
+cd condorbatch/topiary_jobs/
+source setup_RestFrames.sh
+make
+```
+
+This *will throw warnings*, they can be ignored. For now. I am sure this will bite at some point, but right now, that it is just a warning. If it throws an error, that is not expected. Fix it. This will give you a setup that will run both as a batch job and interactively. If any changes are made to the class, the class will have to be be recompiled with `make` again.
+
+### Runnings Topiary
+
+The Topiary code runs on the *skims* that are stored in the lpcboostres directory on the cmslpc eos. The code in its base form can be run either interactively or as batch job (only testing on the cmslpc Condor cluster). Regardless of what you do, it is good to make sure you have a valid GRID proxy, 
+
+```
+voms-proxy-init --rfc --voms cms -valid 192:00
+```
+
+and type in your grid passphrase. You probably only need to do it for batch job submission, but, eh. Do it regularly, do not forget your pass phrase! The skims that are available to run over are listed in the
+
+```
+condorbatch/samples
+```
+
+and all have the form `skim_locations_YEAR_TYPE.json`, where `YEAR` is `20161,2017`, or `2018`, and the `TYPE` is `MC`, 'Signal, or `Data`. The `.txt` files of the same name are the handmade files with the `eos` directories where the skims reside. All the samples and datasets used in the analysis should have `json` files. To make new `json` files, first, make a `.txt` file that lists each of the directories in the `lpcboostres` space that has the desired skims. The skim directories must have the complete skim set included -- *skims will not be connected across directories at this step.* The directory names must each be on a new line. To create the `.json`, run
+
+```bash
+source /cvmfs/sft.cern.ch/lcg/views/LCG_99/x86_64-centos7-gcc10-opt/setup.sh
+python makeSkimJson.py -f TEXTFILE -n YEAR_TYPE 
+```
+
+#### Runnings as a batch job on the LPC
+
 
 
 ## Running Jobs on the lpc Condor Cluster
