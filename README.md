@@ -95,19 +95,50 @@ python makeSkimJson.py -f TEXTFILE -n YEAR_TYPE
 
 #### Runnings as a batch job on the LPC
 
-
-
-## Running Jobs on the lpc Condor Cluster
-
-All processing can now be run as jobs. Things can be run interactively as well, but it takes a bit of finagling to get the command line options correct (mostly need the full path for accessing files on eos). As always, one has to make sure they have a valid grid certificate and proxy active, so you might as well run it for the max time by executing:
+To submit jobs, make sure you are in the `condorbatch` folder, and that you have the topiary enviroment sourced using:
 
 ```
-voms-proxy-init --rfc --voms cms -valid 192:00
+source /cvmfs/sft.cern.ch/lcg/views/LCG_99/x86_64-centos7-gcc10-opt/setup.sh
 ```
 
-### Topiary Jobs
+To submit all the topiary jobs for all of the samples in the skim, execute something like:
 
-These are really complicated with a lot of dependecies. Working on make this setup smoother.
+```bash
+python submitTopiaryJobs.py -j samples/skim_locations_YEAR_TYPE.json -c CHANNEL 
 
-### Selection jobs
+Where `YEAR` is `2016`, `2017`, or `2018`, `TYPE` is `MC`, `Data`, or `Signal`, and `chan` is `mumu`, or `emu`, depending on if you want the dimuon channel or the electron/muon ttbar control region. Additional options can be found with `-h`, like options for systematics (jec, jer, and unclustered MET all must be done at this level), and options to only run for one sample in the json.
 
+This will automatically create an output folder on the cmslpc eos with the name `/store/group/lpcboostres/topiaries_systematics-SYSTEMATICSSTRING_SUBMISSIONDATE`. For example, submitting jobs for the "up" JEC systematic on September 27, 2023, produces and output directory `/store/user/lpcboostres/topiaries_systematics-upjec_2023-09-27`. The `stdout`, `stderr`, and `log` files are dumped into an automatically generated folder in the submission directory called `condorMonitoringOutput`. Outfiles will be in subfolders of the submission date.
+
+To check for failed jobs and resubmit without debug, run the following 
+
+```
+python checkForFailedTopiaryJobs.py -d DATE_SUB_IN_YYYY_MM_DD -r True [same command options as the original submission]
+```
+
+Where the `-d` is the `YYYY_MM_DD` you submitted the original jobs, `-r` is whether or not you want to resubmit the jobs (True is yes), and use `-h` rto see the other options you need to add to be in line with the original submission. Running without `-r` will just print the missing samples.
+
+General comments:
+*   With one submission, only do one systematic (ie, JECs) at one time, to better organize the outfolders on eos (and control job #)
+*   Each year has around 12 background MC samples, so one year, nominal, up/dwn jecs, up/dwn jer, and up/dwn unclmet gives 84 jobs 
+*   Known bugs in this process have open issues - check there to see if your issue is known
+
+#### Running interactively
+
+Topiary makers can also be run interactively, but are now strealined to run in batch, making running interactively a bit clunky but possible. The topiary runner, `runTopiary.py` in the `topiary_jobs` folder takes a list of paths to skims on eos, so to get those paths, source the topiary LCG environment, and run
+
+```
+python submitTopiaryJobs.py -j samples/skim_locations_YEAR_TYPE.json -c chan -s SAMPLENAME -k True
+```
+
+where `-k` kills the submission of the jobs and `.jdl` creation, and instead prints the arguments that get passed to the `trimmer.sh` and then to `runTopiary.py`. To run interactively you do not need `trimmer.sh`, but it does not directly print what goes to `runTopiary.py`, so consider yourself warned. Just copying the eos list as is directly is enough.
+
+Once you have the file paths needed to run, to run topiary for one sample interactively,
+
+```bash
+cd topiary_jobs
+source setup_RestFrames.sh 
+python runTopiary.py -s SAMPLE -c CHANNEL -l LISTOFEOS -syst SYST
+```
+
+run `python runTopiary.py -h` for more details. Again, pasting directly the list printed by `submitTopiaryJobs.py` should work for the `-l`. This will automatically create a subdirectory in `topiary_jobs` called `analysis_output_zpanomalon` and the output will be in a submission date subdirectory. Make sure to move the output out of the `topiary_jobs` directory to not have it in the tarball made for job submission.
