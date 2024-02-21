@@ -57,9 +57,14 @@ The University of Hamburg has a nice ntuplizer that does the heavy lifting of th
 cp Makefile.common condorbatch/topiary_jobs/UHH2/.
 cd condorbatch/topiary_jobs/UHH2/JetMETObjects/
 make
+sed -i '\/#include <UHH2\/JetMETObjects\/interface\/JetResolutionObject.h>/c\#include <JetResolutionObject.h>' interface/JetResolution.h
 ```
 
 This will build the parts of the `UHH2` we need. We probably could get away with all of the parts of the repository, but this works, and that is what matters to me in the present moment.
+
+#### Linking it all together
+
+If you peruse the `topiary_jobs` subdirectory in the `condorbatch` directory, you will quickly see many subdirectories. These all hold the scale factors applied in this analysis. They came from a wide variety of places, and some were custom generated. That documentation is found in the note. Initially, and after any change to the topiary class, the whole directory must be compiled. And for that to work, several things must happen.
 
 
 ## Running Jobs on the lpc Condor Cluster
