@@ -37,7 +37,7 @@ source /cvmfs/sft.cern.ch/lcg/views/LCG_99/x86_64-centos7-gcc10-opt/setup.sh
 
 Topiary has a lot of dependencies that make it tricker to setup and run, but we will get there. Most of this only has to be done once. I am sure there are better ways to do this, but this was the best compromise of ease and expedience I could produce.
 
-#### RestFrames
+#### RestFrames Installation
 
 We use the [RestFrames](http://restframes.com/) package to calculate the mass esitmators of the Z' cascade decay. RestFrames is run in the 'topiary' step, which is setup to be run as a condor bacth job. Therefore, all of the topiary-step dependencies are built in the `condorbatch/topiary_jobs` directory. MAKE SURE THE ABOVE ENOVIRONMENT IS SOURCED. To build `RestFrames` in the topiary environment, do:
 
@@ -49,8 +49,17 @@ make install
 ```
 Compiling restframes can take up to 10 minutes, so do not panic.
 
-#### UHH for Jet Systematics
+#### UHH2 for Jet Systematics Installation
 
+The University of Hamburg has a nice ntuplizer that does the heavy lifting of the JEC systematic and the JER systematics for you. Because of this, we use bits and pieces of the their framework at the topiary level, and we do some compiler things to make it work. To build, starting from the `ZpAnomalonChimera` top directory do:
+
+```bash
+cp Makefile.common condorbatch/topiary_jobs/UHH2/.
+cd condorbatch/topiary_jobs/UHH2/JetMETObjects/
+make
+```
+
+This will build the parts of the `UHH2` we need. We probably could get away with all of the parts of the repository, but this works, and that is what matters to me in the present moment.
 
 
 ## Running Jobs on the lpc Condor Cluster
