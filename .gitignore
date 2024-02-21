@@ -7,3 +7,4 @@ physpy
 condorbatch/condorMonitoringOutput
 condorbatch/*.jdl
 condorbatch/*.jdl~
+*.so
