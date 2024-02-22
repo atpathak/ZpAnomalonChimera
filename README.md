@@ -19,6 +19,8 @@ if you already have Python 3 working with ROOT, with the above dependences, skip
 
 We want to use cvmfs and stuff so this works on the LPC because the original conda environment pre-2023 got stale and no longer works. To find an LCG environment with the packages we want, we need to check the LCG page: https://lcginfo.cern.ch/ . Each step uses different LCG environments -- I am sure this could be alleviated but it was easier to use different LCG environments for the different steps than to significanntly rewrite the framework. 
 
+To do anything with making Topiaries, we need to
+
 ```
 source /cvmfs/sft.cern.ch/lcg/views/LCG_99/x86_64-centos7-gcc10-opt/setup.sh
 ```
@@ -72,7 +74,7 @@ make
 
 This *will throw warnings*, they can be ignored. For now. I am sure this will bite at some point, but right now, that it is just a warning. If it throws an error, that is not expected. Fix it. This will give you a setup that will run both as a batch job and interactively. If any changes are made to the class, the class will have to be be recompiled with `make` again.
 
-### Runnings Topiary
+### Running Topiary
 
 The Topiary code runs on the *skims* that are stored in the lpcboostres directory on the cmslpc eos. The code in its base form can be run either interactively or as batch job (only testing on the cmslpc Condor cluster). Regardless of what you do, it is good to make sure you have a valid GRID proxy, 
 
@@ -105,6 +107,7 @@ To submit all the topiary jobs for all of the samples in the skim, execute somet
 
 ```bash
 python submitTopiaryJobs.py -j samples/skim_locations_YEAR_TYPE.json -c CHANNEL 
+```
 
 Where `YEAR` is `2016`, `2017`, or `2018`, `TYPE` is `MC`, `Data`, or `Signal`, and `chan` is `mumu`, or `emu`, depending on if you want the dimuon channel or the electron/muon ttbar control region. Additional options can be found with `-h`, like options for systematics (jec, jer, and unclustered MET all must be done at this level), and options to only run for one sample in the json.
 
@@ -142,3 +145,7 @@ python runTopiary.py -s SAMPLE -c CHANNEL -l LISTOFEOS -syst SYST
 ```
 
 run `python runTopiary.py -h` for more details. Again, pasting directly the list printed by `submitTopiaryJobs.py` should work for the `-l`. This will automatically create a subdirectory in `topiary_jobs` called `analysis_output_zpanomalon` and the output will be in a submission date subdirectory. Make sure to move the output out of the `topiary_jobs` directory to not have it in the tarball made for job submission.
+
+## Doing the selections - cuts, histograms, and event weighting
+
+under construction
