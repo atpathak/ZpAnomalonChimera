@@ -4,3 +4,7 @@ physpy
 *.h~
 *.md~
 *.sh~
+condorbatch/condorMonitoringOutput
+condorbatch/*.jdl
+condorbatch/*.jdl~
+*.so
