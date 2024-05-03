@@ -19,12 +19,6 @@ if you already have Python 3 working with ROOT, with the above dependences, skip
 
 We want to use cvmfs and stuff so this works on the LPC because the original conda environment pre-2023 got stale and no longer works. To find an LCG environment with the packages we want, we need to check the LCG page: https://lcginfo.cern.ch/ . Each step uses different LCG environments -- I am sure this could be alleviated but it was easier to use different LCG environments for the different steps than to significanntly rewrite the framework. 
 
-To do anything with making Topiaries, we need to
-
-```
-source /cvmfs/sft.cern.ch/lcg/views/LCG_99/x86_64-centos7-gcc10-opt/setup.sh
-```
-
 ## Making Topiary - RJR calculation and tree trimming (and flattening)
 
 In principle, everything should be updated to run on the lateset supported versions of things, but principles do not always matter. The analysis originally ran with ROOT version 6.22/08. The closest LCG environment that works uses ROOT 6.22/06, so that is the one we will use! While running on the LPC or lxplus (though these instructions are not tested on lxplus), cvmfs is mounted, so to source the environment (in bash), run
@@ -33,7 +27,7 @@ In principle, everything should be updated to run on the lateset supported versi
 source /cvmfs/sft.cern.ch/lcg/views/LCG_99/x86_64-centos7-gcc10-opt/setup.sh
 ```
 
-### Setting up the dependencies
+### Setting up the dependencies - First setup
 
 Topiary has a lot of dependencies that make it tricker to setup and run, but we will get there. Most of this only has to be done once. I am sure there are better ways to do this, but this was the best compromise of ease and expedience I could produce.
 
