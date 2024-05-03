@@ -4,6 +4,7 @@ physpy
 *.h~
 *.md~
 *.sh~
+*.txt~
 condorbatch/condorMonitoringOutput
 condorbatch/*.jdl
 condorbatch/*.jdl~
