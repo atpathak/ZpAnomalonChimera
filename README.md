@@ -19,12 +19,6 @@ if you already have Python 3 working with ROOT, with the above dependences, skip
 
 We want to use cvmfs and stuff so this works on the LPC because the original conda environment pre-2023 got stale and no longer works. To find an LCG environment with the packages we want, we need to check the LCG page: https://lcginfo.cern.ch/ . Each step uses different LCG environments -- I am sure this could be alleviated but it was easier to use different LCG environments for the different steps than to significanntly rewrite the framework. 
 
-To do anything with making Topiaries, we need to
-
-```
-source /cvmfs/sft.cern.ch/lcg/views/LCG_99/x86_64-centos7-gcc10-opt/setup.sh
-```
-
 ## Making Topiary - RJR calculation and tree trimming (and flattening)
 
 In principle, everything should be updated to run on the lateset supported versions of things, but principles do not always matter. The analysis originally ran with ROOT version 6.22/08. The closest LCG environment that works uses ROOT 6.22/06, so that is the one we will use! While running on the LPC or lxplus (though these instructions are not tested on lxplus), cvmfs is mounted, so to source the environment (in bash), run
@@ -33,7 +27,7 @@ In principle, everything should be updated to run on the lateset supported versi
 source /cvmfs/sft.cern.ch/lcg/views/LCG_99/x86_64-centos7-gcc10-opt/setup.sh
 ```
 
-### Setting up the dependencies
+### Setting up the dependencies - First setup
 
 Topiary has a lot of dependencies that make it tricker to setup and run, but we will get there. Most of this only has to be done once. I am sure there are better ways to do this, but this was the best compromise of ease and expedience I could produce.
 
@@ -95,7 +89,7 @@ source /cvmfs/sft.cern.ch/lcg/views/LCG_99/x86_64-centos7-gcc10-opt/setup.sh
 python makeSkimJson.py -f TEXTFILE -n YEAR_TYPE 
 ```
 
-#### Runnings as a batch job on the LPC
+#### Running Topiary as a batch job on the LPC
 
 To submit jobs, make sure you are in the `condorbatch` folder, and that you have the topiary enviroment sourced using:
 
@@ -148,4 +142,69 @@ run `python runTopiary.py -h` for more details. Again, pasting directly the list
 
 ## Doing the selections - cuts, histograms, and event weighting
 
-under construction
+The topiary step flattens trees and builds/selects our objects. The 'selection' step applies kinematic cuts, separates the regions, and builds histograms. This is done via a Pandas dataframe with Uproot-- but an old version. To run the selections, a different LCG environment is needed:
+
+```
+source /cvmfs/sft.cern.ch/lcg/views/LCG_100/x86_64-centos7-gcc10-opt/setup.sh
+```
+
+### Running selections
+
+The selection code runs on the *topiaries* that are stored in the lpcboostres directory on the cmslpc eos. The code in its base form can be run either interactively or as batch job (only testing on the cmslpc Condor cluster). Make sure you have a GRID proxy setup by executing
+
+```
+voms-proxy-init --rfc --voms cms -valid 192:00
+```
+
+and typing in your grid passphrase. The skims that are available to run over are listed in the
+
+```
+condorbatch/samples
+```
+
+directory and are separated by systematics that have to be applied at the topiary step and those that are added as event weights later. To make new  `.json` files make a `.txt` file that lists each of the directories in the `lpcboostres` space that has the desired skims. The skim directories must have the complete skim set included -- *skims will not be connected across directories at this step.* The directory names must each be on a new line. To create the `.json`, run
+
+```bash
+source /cvmfs/sft.cern.ch/lcg/views/LCG_100/x86_64-centos7-gcc10-opt/setup.sh
+python makeTopiaryJson.py -f TEXTFILE -n TYPE_DESCRIPTION 
+```
+
+#### Running Selections as a batch job on the LPC
+
+To submit jobs, make sure you are in the `condorbatch` folder, and that you have the topiary enviroment sourced using:
+
+```
+source /cvmfs/sft.cern.ch/lcg/views/LCG_100/x86_64-centos7-gcc10-opt/setup.sh
+```
+
+To submit all the selection jobs for all of the topiaries in the `.json`, execute something like:
+
+```bash
+python submitSelectionJobs.py -j samples/topiary_locations_TYPE_DESCRIPTION.json -c CHANNEL 
+```
+
+Where `TYPE` is `MC`, `Data`, or `Signal`, and `CHANNEL` is `mumu`, or `emu`, depending on if you want the dimuon channel or the electron/muon ttbar control region. Additional options can be found with `-h`. To do systematics, as the *last* command line argument, add
+
+```bash
+python submitSelectionJobs.py -j samples/topiary_locations_TYPE_DESCRIPTION.json -c CHANNEL -syst syst1 syst2 ...
+```
+
+where `syst1 syst2 ...` is a space separated list with options from
+
+```
+pdf
+qcd
+prefire
+pumapWeight
+pumapPUnum
+btag
+muid
+mutrg
+uncl
+jec
+jer
+```
+
+*NOTE* The last three (`uncl, jec, jer`) need to be run on a topiary that has these shifts already implemented. THe others are done as event weights and are run on nominal topiaries. Providing multiple systematics only adds them each to the same job, reducing the number of jobs, but increasing the job length.
+
+This will automatically create an output folder on the cmslpc eos with the name `/store/group/lpcboostres/topiaries_systematics-SYSTEMATICSSTRING_SUBMISSIONDATE`. For example, submitting jobs for the "up" JEC systematic on September 27, 2023, produces and output directory `/store/user/lpcboostres/topiaries_systematics-upjec_2023-09-27`. The `stdout`, `stderr`, and `log` files are dumped into an automatically generated folder in the submission directory called `condorMonitoringOutput`. Outfiles will be in subfolders of the submission date.

@@ -10,7 +10,7 @@ if __name__=='__main__':
     parser.add_argument("-j","--sampleJson",help=".json file with the skims to be made into topiary")
     parser.add_argument("-s","--sample",type=str,help="specific sample you want make a topiary of (if you want, can run without and just does all in json)")
     parser.add_argument("-c","--channel",type=str,help="channel: mumu,ee,emu")
-    parser.add_argument("-syst","--syststr",type=str,default="none",help="the systematic flag you want topiary to make (blank also works)")
+    parser.add_argument("-syst","--syststr",type=str,default="none",help="the systematic flag you want topiary to make (blank also works) upjec,dwnjec,upjer,dwnjer,upuncl,dwnuncl")
     parser.add_argument("-k","--killsubmission",type=bool,default=False,help="removes jdl creation and job submission, meant for printing a command to pass for interactive running")
     parser.add_argument("-print","--printsamples",type=bool,default=False,help="print samples available in the  json - nothing else.")
     args = parser.parse_args()
